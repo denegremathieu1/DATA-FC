@@ -1,0 +1,28 @@
+WITH tab1 AS (
+SELECT 
+  name
+  , to_club_name AS Club_acheteur
+  , transfer_season
+# Agrégation par club pour avoir le montant total de transfert
+  , SUM(transfer_fee) AS total_transfert_achat
+  , COUNT(*) AS number_of_transfert
+FROM analog-medium-477218-f3.modele_data.transfert_achat
+GROUP BY name, Club_acheteur, transfer_season
+)
+
+SELECT
+  tab2.Club_table_affluence AS Club
+  , tab1.Club_acheteur
+  , tab1.transfer_season
+  , tab1.total_transfert_achat
+  , tab1.number_of_transfert
+FROM tab1
+LEFT JOIN `analog-medium-477218-f3.transfermarket_data.PK_KPI_financier` AS tab2
+ON tab1.name = tab2.Club_table_clubs
+WHERE tab2.Club_table_affluence IS NOT NULL
+ORDER BY Club
+  , Club_acheteur
+  , transfer_season
+
+
+

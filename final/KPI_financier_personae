@@ -1,0 +1,64 @@
+WITH tab1 AS (
+  SELECT
+  Pays
+    , Championnat
+    , Club
+    , ROUND(AVG(Average_market_value),2) AS Average_market_value
+    , ROUND(AVG(Total_market_value),2) AS Total_market_value
+  FROM `analog-medium-477218-f3.final_model.KPI_financier_Market_value_3_years_jointure_country`
+  GROUP BY Pays
+    , Championnat
+    , Club
+  ORDER BY Pays
+    , Championnat
+    , Club
+),
+
+tab2 AS (
+  SELECT  
+    Pays
+      , Championnat
+      , Club
+      , SUM(total_transfert_achat) AS total_transfert_achat
+      , SUM(nb_transfert_achat) AS nb_transfert_achat
+      , SUM(total_transfert_vente) AS total_transfert_vente
+      , SUM(nb_transfert_vente) AS nb_transfert_vente
+  FROM `analog-medium-477218-f3.final_model.KPI_financier_transfert_all_season_jointure_country` 
+  GROUP BY Pays
+    , Championnat
+    , Club
+  ORDER BY Pays
+    , Championnat
+    , Club  
+)
+SELECT  
+  tab3.*
+  , CASE
+      WHEN tab1.Average_market_value IS NULL THEN 0
+      ELSE tab1.Average_market_value
+    END AS Average_market_value
+  , CASE 
+      WHEN tab1.Total_market_value IS NULL THEN 0
+      ELSE tab1.Total_market_value
+    END AS Total_market_value
+  , CASE
+      WHEN tab2.total_transfert_achat IS NULL THEN 0
+      ELSE tab2.total_transfert_achat
+    END AS total_transfert_achat
+  , CASE
+      WHEN tab2.nb_transfert_achat IS NULL THEN 0
+      ELSE tab2.nb_transfert_achat
+    END AS nb_transfert_achat
+  , CASE
+      WHEN tab2.total_transfert_vente IS NULL THEN 0
+      ELSE tab2.total_transfert_vente
+    END AS total_transfert_vente
+  , CASE
+      WHEN tab2.nb_transfert_vente IS NULL THEN 0
+      ELSE tab2.nb_transfert_vente
+    END AS nb_transfert_vente
+FROM `analog-medium-477218-f3.final_model.KPI_financier_Jointure_Valeur_entreprise_jointure_country` AS tab3
+LEFT JOIN tab1
+ON tab3.Club = tab1.Club
+LEFT JOIN tab2
+ON  tab3.Club = tab2.Club

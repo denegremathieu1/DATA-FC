@@ -1,0 +1,76 @@
+# Transformation de la colonne net_transfer_record de STRING en FLOAT
+
+WITH s1 AS (
+  SELECT
+    club_id
+    , name
+    , domestic_competition_id
+    , net_transfer_record
+  # Suppression de la devise € et +- pour les lignes nulles
+    , CASE
+        WHEN REGEXP_CONTAINS(net_transfer_record, r'\+€') THEN REPLACE(net_transfer_record, "+€", "+")
+        WHEN REGEXP_CONTAINS(net_transfer_record, r'\+-') THEN REPLACE(net_transfer_record, "+-", "")
+        WHEN REGEXP_CONTAINS(net_transfer_record, r"€-") THEN REPLACE(net_transfer_record, "€-", "-")
+        END AS net_transfer_record_sans_devise
+    , last_season
+  FROM `analog-medium-477218-f3.transfermarket_data.clubs`
+),
+
+s2 AS (
+  SELECT
+    club_id
+    , name
+    , domestic_competition_id
+    , net_transfer_record
+    , net_transfer_record_sans_devise
+  # Création d'une colonne is_positif pour savoir si montant est positif ou négatif
+    , CASE
+        WHEN REGEXP_CONTAINS(net_transfer_record_sans_devise, r'\+') THEN 1
+        WHEN REGEXP_CONTAINS(net_transfer_record_sans_devise, '-') THEN 0
+        ELSE 1
+        END AS is_positif
+  # Suppression des signes + et -
+    , CASE
+        WHEN REGEXP_CONTAINS(net_transfer_record_sans_devise, r'\+') THEN REPLACE(net_transfer_record_sans_devise, "+", "")
+        WHEN REGEXP_CONTAINS(net_transfer_record_sans_devise, '-') THEN REPLACE(net_transfer_record_sans_devise, "-", "")
+        ELSE net_transfer_record_sans_devise
+        END AS net_transfer_record_string
+    , last_season
+  FROM s1
+),
+
+s3 AS (
+  SELECT 
+    club_id
+    , name
+    , domestic_competition_id
+    , net_transfer_record
+    , net_transfer_record_sans_devise
+    , is_positif
+    , net_transfer_record_string
+  # Suppression des abbréviations bn, k et m et remplacement par des 0
+    , CASE
+        WHEN REGEXP_CONTAINS(net_transfer_record_string, 'k') THEN REPLACE(net_transfer_record_string, "k", "000")
+        WHEN REGEXP_CONTAINS(net_transfer_record_string, 'm') THEN REPLACE(net_transfer_record_string, "m", "0000")
+        ELSE net_transfer_record_string
+        END AS net_transfer_record_string_value
+    , last_season
+  FROM s2
+)
+
+SELECT
+  name
+  , net_transfer_record
+  , is_positif
+# Suppression des . et transformation colonne en FLOAT
+  , CAST(REPLACE(net_transfer_record_string_value,'.','') AS FLOAT64) AS net_transfer_record_VF
+  , last_season
+FROM s3
+# Filtre sur les championnats du big5 et les saisons 2023 et 2024
+WHERE (last_season = 2023
+  OR last_season = 2024)
+  AND  (domestic_competition_id = "FR1"
+   OR domestic_competition_id = "IT1"
+   OR domestic_competition_id = "ES1"
+   OR domestic_competition_id = "GB1"
+   OR domestic_competition_id = "L1");

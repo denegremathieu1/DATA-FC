@@ -1,0 +1,44 @@
+WITH tab1 AS (
+  SELECT  
+      current_club_name,
+      last_season,
+# Agrégation par club pour avoir la valeur moyenne et max de market_value par joueur 
+      ROUND(AVG(market_value_in_eur), 2) AS avg_market_value,
+      MAX(highest_market_value_in_eur) AS highest_market_value
+  FROM `analog-medium-477218-f3.transfermarket_data.players`
+# Filtre sur les deux dernières saisons
+  WHERE last_season IN (2023, 2024)
+  GROUP BY current_club_name, last_season
+),
+
+tab2 AS (
+  SELECT
+    *
+  FROM tab1
+# Première fonction pivot pour affichage de la première agrégation en colonne
+  PIVOT(
+    AVG(avg_market_value) FOR last_season IN (2023, 2024)
+  )
+),
+
+tab3 AS (
+  SELECT *
+  FROM tab1
+# Deuxième fonction pivot pour affichage de la deuxième agrégation en colonne
+  PIVOT(
+    MAX(highest_market_value) FOR last_season IN (2023, 2024)
+  )
+)
+
+# Fusion des deux pivots
+SELECT 
+  tab3.current_club_name AS club,
+  AVG(tab2._2023) AS avg_market_value_2023,
+  AVG(tab2._2024) AS avg_market_value_2024,
+  MAX(tab3._2023) AS highest_market_value_2023,
+  MAX(tab3._2024) AS highest_market_value_2024
+FROM tab2
+INNER JOIN tab3
+    USING (current_club_name)
+GROUP BY club
+ORDER BY club;

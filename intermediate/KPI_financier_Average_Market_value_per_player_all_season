@@ -1,0 +1,16 @@
+SELECT  
+  tab2.Club_table_affluence AS Club
+  , tab1.current_club_name
+  , tab1.last_season
+  , ROUND(AVG(tab1.market_value_in_eur),2) AS Average_market_value_per_player
+  , COUNT(*) AS Number_of_player
+FROM `analog-medium-477218-f3.transfermarket_data.players` AS tab1
+LEFT JOIN analog-medium-477218-f3.transfermarket_data.PK_KPI_financier AS tab2
+ON tab1.current_club_name = tab2.Club_table_clubs
+WHERE current_club_domestic_competition_id IN("L1","FR1","ES1","IT1","GB1")
+GROUP BY Club
+  , tab1.current_club_name
+  , tab1.last_season
+ORDER BY Club
+  , tab1.current_club_name
+  , tab1.last_season

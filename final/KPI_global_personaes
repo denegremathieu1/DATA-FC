@@ -1,0 +1,39 @@
+--1ère etape: ajout du nom de l'investissuer dans 1 colonne
+WITH tab1 AS (
+  SELECT 
+    *
+    , CASE 
+        WHEN Club in ("SC Paderborn 07", "SD Huesca", "Cádiz CF", "Spezia Calcio", "AFC Bournemouth") THEN "Bob"
+        WHEN Club IN ("Bayern Munich", "FC Liverpool", "Manchester City", "FC Barcelone", "Real Madrid") THEN "Nasser"
+        WHEN Club IN ("1.FC Köln", "FC Schalke 04", "Hamburger SV", "AFC Bournemouth", "RC Lens") THEN "Ryan"
+      ELSE NULL 
+      END AS Personae
+  FROM `analog-medium-477218-f3.final_model.KPI_GLOBAL`),
+
+--2ème etape: creation de 3 colonnes de boolean
+tab2 AS (
+SELECT 
+  tab1.*
+  , CASE 
+      WHEN Personae = "Bob" THEN TRUE
+    ELSE FALSE
+    END AS Bob
+  , CASE 
+      WHEN Personae = "Nasser" THEN TRUE
+    ELSE FALSE
+    END AS Nasser
+, CASE 
+    WHEN Personae = "Ryan" THEN TRUE
+  ELSE FALSE
+  END AS Ryan
+FROM tab1
+)
+-- 3ème etape: modifier la ligne Bournemouth et mettre TRUE dans la colonne Ryan
+
+SELECT
+  tab2.*
+  , CASE
+      WHEN Club = "AFC Bournemouth" THEN true
+      ELSE Ryan
+    END AS Ryan_new
+FROM tab2

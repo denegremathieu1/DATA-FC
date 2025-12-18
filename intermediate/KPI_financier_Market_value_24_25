@@ -1,0 +1,43 @@
+# Sélection des colonnes liées au financier
+
+WITH s1 AS (SELECT 
+  Pays
+  , Division AS Ligue
+  , Level AS Division
+  , Club
+# Suppression des devises
+  , REPLACE(___market_value_2024_2025, "€", "") AS Average_market_value_2024_2025
+  , REPLACE(Total_market_value_2024_2025, "€", "") AS Total_market_value_2024_2025
+FROM `analog-medium-477218-f3.transfermarket_data.Evolution_valeur_marchande_24_25`
+),
+
+s2 AS (SELECT
+  s1.Pays
+  , s1.Ligue
+  , s1.Division
+  , s1.Club
+# Suppression des abbréviations bn, k et m et remplacement par des 0
+  , CASE
+      WHEN REGEXP_CONTAINS(Average_market_value_2024_2025, 'k') THEN REPLACE(Average_market_value_2024_2025, "k", "000")
+      WHEN REGEXP_CONTAINS(Average_market_value_2024_2025, 'm') THEN REPLACE(Average_market_value_2024_2025, "m", "0000")
+      ELSE Average_market_value_2024_2025
+    END AS Average_market_value_2024_2025
+  , CASE
+      WHEN REGEXP_CONTAINS(Total_market_value_2024_2025, 'k') THEN REPLACE(Total_market_value_2024_2025, "k", "000")
+      WHEN REGEXP_CONTAINS(Total_market_value_2024_2025, 'm') THEN REPLACE(Total_market_value_2024_2025, "m", "0000")
+      WHEN REGEXP_CONTAINS(Total_market_value_2024_2025, 'bn') THEN REPLACE(Total_market_value_2024_2025, "bn", "0000000")
+      ELSE Total_market_value_2024_2025
+    END AS Total_market_value_2024_2025
+FROM s1
+)
+
+SELECT
+  s2.Pays
+  , s2.Ligue
+  , s2.Division
+  , s2.Club
+  , "24/25" AS Season
+# Suppression des . et transformation colonne en FLOAT
+  , CAST(REPLACE(Average_market_value_2024_2025,".","") AS FLOAT64) AS Average_market_value
+  , CAST(REPLACE(Total_market_value_2024_2025,".","") AS FLOAT64) AS Total_market_value
+FROM s2

@@ -1,0 +1,12 @@
+SELECT  
+  tab2.Pays
+  , tab2.Championnat
+  , tab2.Club
+  , tab1.name
+  , tab1.last_season
+  , tab1.market_value_in_eur
+  , tab1.rn
+FROM `analog-medium-477218-f3.modele_data.KPI_financier_top3_player` AS tab1
+LEFT JOIN `analog-medium-477218-f3.transfermarket_data.Club_geoloc_country_ladders` AS tab2
+ON tab1.Club = tab2.Club
+ORDER BY Pays, Championnat, Club

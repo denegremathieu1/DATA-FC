@@ -1,0 +1,26 @@
+SELECT  
+  tab2.Pays
+  , tab2.Championnat
+  , tab2.Club
+  , tab1.transfer_season
+  , CASE
+      WHEN tab1.total_transfert_achat IS NULL THEN 0
+      ELSE tab1.total_transfert_achat
+    END total_transfert_achat
+  , CASE
+      WHEN tab1.nb_transfert_achat IS NULL THEN 0
+      ELSE tab1.nb_transfert_achat
+    END nb_transfert_achat
+  , CASE
+      WHEN tab1.total_transfert_vente IS NULL THEN 0
+      ELSE tab1.total_transfert_vente
+    END total_transfert_vente
+  , CASE
+      WHEN tab1.nb_transfert_vente IS NULL THEN 0
+      ELSE tab1.nb_transfert_vente 
+    END AS nb_transfert_vente 
+FROM `analog-medium-477218-f3.final_model.KPI_financier_transfert_all_season_jointure` AS tab1
+LEFT JOIN analog-medium-477218-f3.transfermarket_data.Club_geoloc_country_ladders AS tab2
+ON tab1.Club = tab2.Club
+WHERE transfer_season IN("14/15","15/16","17/18","18/19","19/20","20/21","21/22","22/23","23/24","24/25")
+ORDER BY Pays, Championnat, Club, transfer_season DESC

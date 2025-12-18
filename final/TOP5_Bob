@@ -1,0 +1,43 @@
+WITH tab1 AS (
+SELECT  
+  fin.*
+  , pop.Capacite
+  , CASE
+      WHEN pop.Nb_total_spectateurs_22_23 > pop.Nb_total_spectateurs_24_25 THEN pop.Nb_total_spectateurs_22_23
+      ELSE pop.Nb_total_spectateurs_24_25
+    END AS Nb_total_spectateurs
+  , CASE
+      WHEN pop.Moy_aff_match_22_23 > pop.Moy_aff_match_24_25 THEN pop.Moy_aff_match_22_23
+      ELSE pop.Moy_aff_match_24_25
+    END AS Moy_aff_match
+  , CASE
+      WHEN pop.Pourcentage_remplissage_22_23 > pop.Pourcentage_remplissage_24_25 THEN pop.Pourcentage_remplissage_22_23
+      ELSE pop.Pourcentage_remplissage_24_25
+    END AS Pourcentage_remplissage
+  , age.avg_age
+  , iff.indice_formation 
+  , win_rate.avg_win_rate
+  , ppe.Position
+  , ppe.Points
+FROM `analog-medium-477218-f3.final_model.KPI_financier_personae` AS fin
+LEFT JOIN analog-medium-477218-f3.final_model.KPI_popularite AS pop
+ON fin.Club = pop.Club
+LEFT JOIN analog-medium-477218-f3.modele_data.SPORTIF_moyenne_age AS age
+ON fin.Club = age.Club_table_affluence
+LEFT JOIN analog-medium-477218-f3.final_model.SPORTIF_indice_formation_final AS iff
+ON fin.Club = iff.Club
+LEFT JOIN analog-medium-477218-f3.mart.SPORTIF_win_rate_par_saison_finale_ne_pas_effacer_lautre AS win_rate
+ON fin.Club = win_rate.Club
+LEFT JOIN analog-medium-477218-f3.modele_data.KPI_SPORTIF_participation_competition_europeenne AS ppe
+ON fin.Club = ppe.Club_table_affluence)
+
+SELECT
+*
+FROM tab1
+WHERE Valeur_Entreprise_Euros  <= 200000000
+  AND Valeur_Entreprise_Euros != 0      
+AND avg_win_rate >= 0.40   
+AND indice_formation > 50
+ORDER BY Valeur_Entreprise_Euros 
+LIMIT 5
+

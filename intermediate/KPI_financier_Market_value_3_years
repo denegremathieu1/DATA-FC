@@ -1,0 +1,37 @@
+SELECT  
+  tab2.Club_table_affluence
+  , tab1.Club
+  , tab1.Season
+  , tab1.Average_market_value
+  , tab1.Total_market_value
+FROM `analog-medium-477218-f3.modele_data.KPI_financier_Market_value_23_24` AS tab1
+LEFT JOIN analog-medium-477218-f3.transfermarket_data.PK_KPI_financier AS tab2
+ON tab1.Club = tab2.Club_table_valeur_marchande_23_24
+WHERE Pays IN ("England","France","Germany","Italy","Spain")
+
+UNION ALL
+
+SELECT  
+  tab2.Club_table_affluence
+  , tab3.Club
+  , tab3.Season
+  , tab3.Average_market_value
+  , tab3.Total_market_value
+FROM `analog-medium-477218-f3.modele_data.KPI_financier_Market_value_24_25` AS tab3
+LEFT JOIN analog-medium-477218-f3.transfermarket_data.PK_KPI_financier AS tab2
+ON tab3.Club = tab2.Club_table_valeur_marchande_24_25
+WHERE Pays IN ("England","France","Germany","Italy","Spain")
+
+UNION ALL
+
+SELECT  
+  tab2.Club_table_affluence
+  , tab4.Club
+  , tab4.Season
+  , tab4.Average_market_value
+  , tab4.Total_market_value
+FROM `analog-medium-477218-f3.modele_data.KPI_financier_Market_value_25_26` AS tab4
+LEFT JOIN analog-medium-477218-f3.transfermarket_data.PK_KPI_financier AS tab2
+ON tab4.Club = tab2.Club_table_valeur_marchande_25_26
+WHERE Pays IN ("England","France","Germany","Italy","Spain")
+

@@ -1,0 +1,19 @@
+SELECT  
+  tab2.Pays
+  , tab2.Championnat
+  , tab2.Club
+  , tab1.Season
+  , CASE
+      WHEN tab1.Average_market_value IS NULL THEN 0
+      ELSE tab1.Average_market_value
+    END AS Average_market_value
+  , CASE
+      WHEN tab1.Total_market_value IS NULL THEN 0
+      ELSE tab1.Total_market_value
+    END AS Total_market_value
+FROM `analog-medium-477218-f3.modele_data.KPI_financier_Market_value_3_years` AS tab1
+LEFT JOIN `analog-medium-477218-f3.transfermarket_data.Club_geoloc_country_ladders` AS tab2
+ON tab1.Club_table_affluence = tab2.Club
+ORDER BY Pays, Championnat, Club, Season
+
+

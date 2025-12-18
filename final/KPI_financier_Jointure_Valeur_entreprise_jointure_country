@@ -1,0 +1,12 @@
+SELECT  
+  tab1.Pays
+  , tab1.Championnat
+  , tab1.Club
+  , CASE
+      WHEN tab2.Valeur_Entreprise_Euros IS NULL THEN 0
+      ELSE tab2.Valeur_Entreprise_Euros
+    END AS Valeur_Entreprise_Euros
+FROM `analog-medium-477218-f3.transfermarket_data.Club_geoloc_country_ladders` AS tab1
+LEFT JOIN `analog-medium-477218-f3.final_model.KPI_financier_Jointure_Valeur_entreprise` AS tab2
+ON tab1.Club = tab2.Club
+ORDER BY Pays, Championnat, Club

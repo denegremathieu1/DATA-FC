@@ -1,0 +1,27 @@
+WITH s1 AS (
+  SELECT  
+    current_club_name
+    , name
+    , last_season
+    , market_value_in_eur
+    , ROW_NUMBER()OVER(
+        PARTITION BY current_club_name
+        ORDER BY market_value_in_eur DESC) AS rn
+  FROM `analog-medium-477218-f3.transfermarket_data.players` 
+  WHERE (last_season = 2024)
+    AND current_club_domestic_competition_id IN("L1","FR1","ES1","IT1","GB1")
+)
+
+SELECT
+  s2.Club_table_affluence AS Club
+  , s1.current_club_name
+  , s1.name
+  , s1.last_season
+  , s1.market_value_in_eur
+  , s1.rn
+FROM s1
+# Jointure pour ramener la PK
+LEFT JOIN analog-medium-477218-f3.transfermarket_data.PK_KPI_financier AS s2
+ON s1.current_club_name = s2.Club_table_clubs
+WHERE rn <=3
+ORDER BY current_club_name, rn

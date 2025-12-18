@@ -1,0 +1,24 @@
+SELECT DISTINCT
+# Création d'une nouvelle colonne Ligue_new répertoriant les bons championnats selon la division
+  CASE
+      WHEN Ligue = "Premier League" AND Division = 1 THEN "Premier League"
+      WHEN Ligue = "Premier League" AND Division = 2 THEN "Championship"
+      WHEN Ligue = "Premier League" AND Division = 3 THEN "League One"
+      WHEN Ligue = "Bundesliga" AND Division = 1 THEN "Bundesliga"
+      WHEN Ligue = "Bundesliga" AND Division = 2 THEN "2.Bundesliga"
+      WHEN Ligue = "Bundesliga" AND Division = 3 THEN "3.Liga"
+      WHEN Ligue = "Ligue 1" AND Division = 1 THEN "Ligue 1"
+      WHEN Ligue = "Ligue 1" AND Division = 2 THEN "Ligue 2"
+      WHEN Ligue = "Ligue 1" AND Division = 3 THEN "National"
+      WHEN Ligue = "Serie A" AND Division = 1 THEN "Serie A"
+      WHEN Ligue = "Serie A" AND Division = 2 THEN "Serie B"
+      WHEN Ligue = "Serie A" AND Division = 3 THEN "Serie C"
+      WHEN Ligue = "La Liga" AND Division = 1 THEN "LaLiga"
+      WHEN Ligue = "La Liga" AND Division = 2 THEN "LaLiga 2"
+      WHEN Ligue = "La Liga" AND Division = 3 THEN "Primera federacion"
+    END AS Ligue
+    , Division
+    , Club
+  # Transformation de la colonne STRING en FLOAT
+    , CAST(REPLACE(Valeur_Entreprise_Euros," ","") AS FLOAT64) AS Valeur_Entreprise_Euros
+FROM `analog-medium-477218-f3.transfermarket_data.Valeur entreprise raw` 
